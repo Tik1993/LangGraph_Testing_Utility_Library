@@ -77,3 +77,26 @@ Use this to test **individual nodes** without running full graph state compariso
 
 - `True` if all specified keys (or the whole node state if `state_keys` is `None`) match `expected_state`
 - `False` otherwise
+
+### `test_partial_execution(graph, node_before_start_node, end_node, state_keys=None, initial_state=None, expected_state=None)`
+
+**Description:**  
+Execute a LangGraph **partially**, starting immediately after a given node and stopping at a specified end node.  
+The resulting state at interruption is compared against the `expected_state`.  
+Use this to test **subsections of a graph** without running the entire workflow.
+
+**Parameters:**
+
+| Name                     | Type                  | Description                                                                                     |
+| ------------------------ | --------------------- | ----------------------------------------------------------------------------------------------- |
+| `graph`                  | LangGraph object      | A graph object with a `.compile()` method returning an object with `.invoke(state)`             |
+| `node_before_start_node` | str                   | The node immediately before the desired start point. Execution resumes just **after** this node |
+| `end_node`               | str                   | The node at which execution stops, using `interrupt_after`                                      |
+| `state_keys`             | list of str, optional | Keys in the state to check. If `None`, the entire state is compared                             |
+| `initial_state`          | dict, optional        | Initial state to pass to the graph. Defaults to `{}`                                            |
+| `expected_state`         | dict                  | Expected key-value pairs for the state at interruption                                          |
+
+**Returns:**
+
+- `True` if all specified keys (or the full state if `state_keys` is `None`) match `expected_state`
+- `False` otherwise

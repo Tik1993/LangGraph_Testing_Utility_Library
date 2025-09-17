@@ -1,3 +1,5 @@
+from langgraph.checkpoint.memory import MemorySaver
+
 def test_whole_graph(graph, initial_state=None, expected_final_state=None):
     """
     Execute the entire graph and check if the final state matches the expected state.
@@ -53,6 +55,38 @@ def test_individual_node(graph, node, state_keys=None, initial_state=None, expec
     state= initial_state or {}
     compile_graph = graph.compile()
     result = compile_graph.nodes[node].invoke(state)
+    if state_keys:
+        for key in state_keys:
+            if result[key] != expected_state[key]:
+                return False
+        return True
+    return result == expected_state
+
+def test_partial_execution(graph, node_before_start_node, end_node, state_keys=None, initial_state=None, expected_state=None):
+    """
+    Execute a LangGraph partially, starting just after a given node and stopping at a specific end node.
+    The final state at interruption is compared against expected_state.
+
+    Parameters:
+        graph: LangGraph object with a .compile() method returning an object with .invoke(state)
+        node_before_start_node: str, execution will resume immediately after this node.
+        end_node: str, execution will stop after this node
+        state_keys: list of str, the keys in the state to check; if None, the whole state of the node will be checked
+        initial_state: dict, the initial state to pass to the graph.
+        expected_state: dict, the expected final state to compare against.
+    
+    Returns:
+        True if all specified keys (or the whole node state if state_keys is None) match the expected_state, False otherwise
+    """
+
+    checkpointer = MemorySaver()
+    compiled_graph = graph.compile(checkpointer=checkpointer)
+    config = {"configurable": {"thread_id": "1"}}
+    compiled_graph.update_state(config,
+                                values={"graph_state":initial_state},
+                                as_node=node_before_start_node)
+    result = compiled_graph.invoke(None,config, interrupt_after=end_node)
+    print(result)
     if state_keys:
         for key in state_keys:
             if result[key] != expected_state[key]:
