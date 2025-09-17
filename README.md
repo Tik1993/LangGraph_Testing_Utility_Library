@@ -56,3 +56,24 @@ Use this when you want to test **specific parts of the graph state** without com
 
 - `True` if all keys in `state_keys` match the expected values in `expected_final_state`
 - `False` otherwise
+
+### `test_individual_node(graph, node, state_keys=None, initial_state=None, expected_state=None)`
+
+**Description:**  
+Execute the graph up to a specific node and check if specified state keys of that node match the expected state.  
+Use this to test **individual nodes** without running full graph state comparisons.
+
+**Parameters:**
+
+| Name             | Type                  | Description                                                                                     |
+| ---------------- | --------------------- | ----------------------------------------------------------------------------------------------- |
+| `graph`          | LangGraph object      | A graph object with a `.compile()` method returning an object with `.nodes[node].invoke(state)` |
+| `node`           | str                   | The name of the node to test                                                                    |
+| `state_keys`     | list of str, optional | Keys in the node's state to check; if `None`, the whole node state is compared                  |
+| `initial_state`  | dict, optional        | Initial state to pass to the graph. Defaults to `{}`                                            |
+| `expected_state` | dict                  | Expected key-value pairs for the node's state                                                   |
+
+**Returns:**
+
+- `True` if all specified keys (or the whole node state if `state_keys` is `None`) match `expected_state`
+- `False` otherwise

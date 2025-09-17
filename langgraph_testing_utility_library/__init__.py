@@ -1,1 +1,1 @@
-from .test_helpers import test_whole_graph, test_whole_graph_state
+from .test_helpers import test_whole_graph, test_whole_graph_state, test_individual_node
